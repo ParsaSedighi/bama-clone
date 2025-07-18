@@ -1,13 +1,9 @@
+import { AdvertisementSearch } from "@/components/advertisement-search";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div>
-      <p className="font-vazir">
-        فارسی
-      </p>
-      <p className="font-sans">
-        english
-      </p>
-    </div>
+    <main className="container mx-auto px-4 py-8">
+      <AdvertisementSearch />
+    </main>
   );
 }

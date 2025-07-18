@@ -1,13 +1,25 @@
+"use client";
+
 import Link from "next/link";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { SignOutButton } from "./signout-button";
 
-export async function UserNav() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+export function UserNav() {
+    const { data: session, isPending } = authClient.useSession();
+
+    if (isPending) {
+        return (
+            <header className="border-b">
+                <nav className="container mx-auto px-4 py-2 flex justify-between items-center">
+                    <Link href="/" className="font-bold text-xl">
+                        Car Market
+                    </Link>
+                    <div className="h-10 w-48 bg-gray-200 animate-pulse rounded-md"></div>
+                </nav>
+            </header>
+        );
+    }
 
     return (
         <header className="border-b">

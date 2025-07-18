@@ -20,7 +20,6 @@ export function LoginForm() {
         setIsLoading(true);
         setError(null);
 
-        // Call the signIn.email method from better-auth
         const { error } = await authClient.signIn.email({
             email,
             password,
@@ -31,7 +30,6 @@ export function LoginForm() {
         if (error) {
             setError(error.message as any);
         } else {
-            // On success, redirect to the homepage or a dashboard
             router.push("/");
         }
     };

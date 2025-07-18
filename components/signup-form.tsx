@@ -21,7 +21,6 @@ export function SignUpForm() {
         setIsLoading(true);
         setError(null);
 
-        // Call the signUp.email method from better-auth
         const { error } = await authClient.signUp.email({
             name,
             email,
@@ -33,7 +32,6 @@ export function SignUpForm() {
         if (error) {
             setError(error.message as any);
         } else {
-            // On success, redirect to the homepage or a dashboard
             router.push("/");
         }
     };

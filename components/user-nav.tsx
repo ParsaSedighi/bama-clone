@@ -18,7 +18,10 @@ export async function UserNav() {
                 <div className="flex items-center gap-4">
                     {session ? (
                         <>
-                            <span>Welcome, {session.user.name}</span>
+                            <Button asChild variant="ghost">
+                                <Link href="/dashboard">Dashboard</Link>
+                            </Button>
+                            <span className="text-sm">Welcome, {session.user.name}</span>
                             <SignOutButton />
                         </>
                     ) : (

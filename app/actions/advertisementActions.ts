@@ -215,3 +215,32 @@ export async function getRelatedAdvertisements(brandId: number, currentAdId: str
     }
 }
 
+
+export async function getMyAdvertisements() {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session) {
+        return { success: false, error: "Not authenticated." };
+    }
+
+    try {
+        const advertisements = await db.advertisement.findMany({
+            where: {
+                userId: session.user.id,
+            },
+            include: {
+                car: {
+                    include: {
+                        brand: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+        return { success: true, data: advertisements };
+    } catch (error) {
+        console.error("Error fetching user advertisements:", error);
+        return { success: false, error: "An error occurred fetching your ads." };
+    }
+}

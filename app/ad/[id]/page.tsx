@@ -1,14 +1,25 @@
 import { getAdvertisementById } from "@/app/actions/advertisementActions";
-import { RelatedAds } from "@/components/related-ads";
 import { notFound } from "next/navigation";
+import { RelatedAds } from "@/components/related-ads";
+import { BuyRequestButton } from "@/components/buy-request-button";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function AdDetailPage({ params }: { params: { id: string } }) {
     const { id } = params;
-    const { success, data: ad } = await getAdvertisementById(id);
+
+    const [adResult, session] = await Promise.all([
+        getAdvertisementById(id),
+        auth.api.getSession({ headers: await headers() }),
+    ]);
+
+    const { success, data: ad } = adResult;
 
     if (!success || !ad) {
         notFound();
     }
+
+    const showBuyButton = session && session.user.id !== ad.user.id && !ad.transaction;
 
     return (
         <main className="container mx-auto px-4 py-8">
@@ -48,8 +59,18 @@ export default async function AdDetailPage({ params }: { params: { id: string } 
                             <p><strong>Contact:</strong> {ad.user.email}</p>
                         </div>
                     </div>
+
+                    {showBuyButton && <BuyRequestButton advertisementId={ad.id} />}
+
+                    {/* Using optional chaining (?.) to safely access the status property */}
+                    {ad.transaction && (
+                        <div className="mt-6 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
+                            A transaction for this vehicle is currently in progress (Status: {ad.transaction?.status}).
+                        </div>
+                    )}
                 </div>
             </div>
+
             <RelatedAds brandId={ad.car.brandId} currentAdId={ad.id} />
         </main>
     );

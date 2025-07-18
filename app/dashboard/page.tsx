@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getMyAdvertisements } from "@/app/actions/advertisementActions";
-import { getMySales, getMyPurchases } from "@/app/actions/transactionActions";
+import { getMySales, getMyPurchases, acceptTransaction, rejectTransaction } from "@/app/actions/transactionActions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { TransactionSellerActions } from "@/components/transaction-seller-actions";
 
 export default async function DashboardPage() {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -56,6 +57,12 @@ export default async function DashboardPage() {
                                 <CardContent>
                                     <p><strong>Buyer:</strong> {sale.buyer.name}</p>
                                     <p><strong>Status:</strong> {sale.status}</p>
+                                    <TransactionSellerActions
+                                        transactionId={sale.id}
+                                        transactionStatus={sale.status}
+                                        acceptAction={acceptTransaction.bind(null, sale.id)}
+                                        rejectAction={rejectTransaction.bind(null, sale.id)}
+                                    />
                                 </CardContent>
                             </Card>
                         ))}
@@ -71,7 +78,6 @@ export default async function DashboardPage() {
                             <Card key={purchase.id}>
                                 <CardHeader><CardTitle>{`${purchase.advertisement.car.brand.name} ${purchase.advertisement.car.model}`}</CardTitle></CardHeader>
                                 <CardContent>
-                                    {/* The seller is now accessed through the included advertisement */}
                                     <p><strong>Seller:</strong> {purchase.advertisement.user.name}</p>
                                     <p><strong>Status:</strong> {purchase.status}</p>
                                 </CardContent>

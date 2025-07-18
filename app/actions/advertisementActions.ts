@@ -161,7 +161,7 @@ export async function getAdvertisementById(id: string) {
             include: {
                 car: {
                     include: {
-                        brand: true, // Include the car's brand
+                        brand: true,
                     },
                 },
                 user: {
@@ -172,6 +172,7 @@ export async function getAdvertisementById(id: string) {
                     },
                 },
                 images: true,
+                transaction: true,
             },
         });
 
@@ -185,7 +186,6 @@ export async function getAdvertisementById(id: string) {
         return { success: false, error: "An error occurred fetching the advertisement." };
     }
 }
-
 
 export async function getRelatedAdvertisements(brandId: number, currentAdId: string) {
     try {

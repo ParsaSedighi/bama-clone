@@ -168,7 +168,7 @@ model Transaction {
 
   // A transaction is linked to one Advertisement, which contains the Car and Seller info.
   advertisementId String        @unique
-  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Restrict)
+  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
 
   // We only need to store the Buyer, as the Seller is on the Advertisement.
   buyerId String

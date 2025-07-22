@@ -3,10 +3,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getMyAdvertisements } from "@/app/actions/advertisementActions";
-import { getMySales, getMyPurchases, acceptTransaction, rejectTransaction } from "@/app/actions/transactionActions";
+import { getMySales, getMyPurchases, acceptTransaction, rejectTransaction, completeTransaction } from "@/app/actions/transactionActions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TransactionSellerActions } from "@/components/transaction-seller-actions";
+import { TransactionBuyerActions } from "@/components/transaction-buyer-actions";
 
 export default async function DashboardPage() {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -80,6 +81,10 @@ export default async function DashboardPage() {
                                 <CardContent>
                                     <p><strong>Seller:</strong> {purchase.advertisement.user.name}</p>
                                     <p><strong>Status:</strong> {purchase.status}</p>
+                                    <TransactionBuyerActions
+                                        transactionStatus={purchase.status}
+                                        completeAction={completeTransaction.bind(null, purchase.id)}
+                                    />
                                 </CardContent>
                             </Card>
                         ))}

@@ -6,7 +6,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
-
+import { revalidatePath } from "next/cache";
 
 
 export type SearchFilters = {
@@ -242,5 +242,45 @@ export async function getMyAdvertisements() {
     } catch (error) {
         console.error("Error fetching user advertisements:", error);
         return { success: false, error: "An error occurred fetching your ads." };
+    }
+}
+
+
+export async function deleteAdvertisement(advertisementId: string) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session) {
+        throw new Error("Not authenticated.");
+    }
+
+    try {
+        const adToDelete = await db.advertisement.findUnique({
+            where: { id: advertisementId },
+            select: { userId: true },
+        });
+
+        if (!adToDelete) {
+            throw new Error("Advertisement not found.");
+        }
+
+        const userIsAdmin = session.user.role === "admin" || session.user.role === "superuser";
+        const userIsOwner = adToDelete.userId === session.user.id;
+
+        // Security Check: User must be the owner OR an admin to delete.
+        if (!userIsOwner && !userIsAdmin) {
+            throw new Error("Unauthorized.");
+        }
+
+        // Prisma's onDelete: Cascade will handle deleting related CarImages, PriceHistory, etc.
+        await db.advertisement.delete({
+            where: { id: advertisementId },
+        });
+
+        revalidatePath("/");
+        revalidatePath("/dashboard");
+        revalidatePath(`/ad/${advertisementId}`);
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(error.message || "Database error: Could not delete advertisement.");
+        }
     }
 }
